@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | {{ username }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --background: #121212;
+      --sidebar-bg: #1A1A1A;
+      --card-bg: #1E1E1E;
+      --card-hover-bg: #252525;
+      --text-primary: #EAEAEA;
+      --text-secondary: #A0A0A0;
+      --accent: #3A86FF; /* A vibrant blue for highlights */
+      --border-color: #333333;
+    }
+
+    body {
+      height: 100vh;
+      margin: 0;
+      background-color: var(--background);
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      overflow-x: hidden; /* Prevents horizontal scroll */
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      width: 240px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      height: 100%;
+      padding: 20px 0;
+      transition: width 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 20px 20px 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-brand i {
+      font-size: 24px;
+      color: var(--accent);
+    }
+    .sidebar-brand h4 {
+      margin: 0;
+      font-weight: 600;
+    }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: var(--text-secondary);
+      padding: 15px 25px;
+      font-size: 16px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+    }
+    .sidebar a:hover {
+      background: linear-gradient(90deg, rgba(58, 134, 255, 0.1), transparent);
+      color: var(--text-primary);
+      border-left: 3px solid var(--accent);
+    }
+    .sidebar a.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      border-left: 3px solid var(--accent);
+      background: linear-gradient(90deg, rgba(58, 134, 255, 0.1), transparent);
+    }
+    
+    .sidebar-footer {
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 1px solid var(--border-color);
+    }
+    .sidebar-footer .powered-by-text {
+        font-size: 12px;
+        text-align: center;
+        color: var(--text-secondary);
+        margin-bottom: 10px;
+    }
+    .sidebar-footer a {
+        padding: 10px 25px; /* Adjust padding for logout link */
+    }
+
+    /* --- Main Content --- */
+    .content {
+      margin-left: 240px;
+      padding: 30px;
+      transition: margin-left 0.3s ease;
+    }
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .welcome-text h3 {
+      margin: 0;
+      font-weight: 700;
+    }
+    .welcome-text p {
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* --- Server Cards --- */
+    .card {
+      border-radius: 12px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      background-color: var(--card-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      min-height: 180px;
+      padding: 20px;
+      text-align: left;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      background-color: var(--card-hover-bg);
+      border-color: #444;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .card-header h5 {
+      margin: 0;
+      font-weight: 600;
+    }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #39FF14;
+    }
+    .status-indicator::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background-color: #39FF14;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #39FF14;
+      animation: pulse 2s infinite;
+    }
+    .status-indicator.offline {
+        color: var(--text-secondary);
+    }
+    .status-indicator.offline::before {
+        background-color: var(--text-secondary);
+        box-shadow: none;
+        animation: none;
+    }
+    .server-specs {
+      margin-top: auto; /* Pushes specs to the bottom */
+      font-size: 15px;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .spec-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spec-item i {
+      color: var(--accent);
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* --- Mobile Navigation --- */
+    .mobile-nav {
+      display: none; /* Hidden by default */
+    }
+
+    /* --- Responsive Design --- */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 80px;
+      }
+      .sidebar-brand h4, .sidebar a span, .sidebar-footer .powered-by-text {
+        display: none;
+      }
+      .sidebar a, .sidebar-footer a {
+        justify-content: center;
+      }
+      .content {
+        margin-left: 80px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none; /* Hide sidebar completely on mobile */
+      }
+      .content {
+        margin-left: 0;
+        padding: 20px;
+        padding-bottom: 100px;
+      }
+      .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .mobile-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: var(--sidebar-bg);
+        border-top: 1px solid var(--border-color);
+        z-index: 1001;
+      }
+      .mobile-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: var(--text-secondary);
+        font-size: 12px;
+        gap: 4px;
+      }
+       .mobile-nav a i {
+        font-size: 20px;
+      }
+      .mobile-nav a.active {
+        color: var(--accent);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <i class="bi bi-hdd-stack"></i>
+      <h4>Alvin PANEL</h4>
+    </div>
+    <a href="/dashboard" class="active"><i class="bi bi-house-door-fill"></i> <span>Home</span></a>
+    <a href="/account"><i class="bi bi-person-fill"></i> <span>Account</span></a>
+    <a href="/settings"><i class="bi bi-gear-fill"></i> <span>Settings</span></a>
+    
+    <div class="sidebar-footer">
+        <p class="powered-by-text"><small>Powered By Alvin Hosting</small></p>
+        <a href="/logout"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a>
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    <a href="/dashboard" class="active"><i class="bi bi-house-door-fill"></i> Home</a>
+    <a href="/account"><i class="bi bi-person-fill"></i> Account</a>
+    <a href="/settings"><i class="bi bi-gear-fill"></i> Settings</a>
+    <a href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+  </nav>
+
+  <div class="content">
+    <header class="main-header">
+      <div class="welcome-text">
+        <h3>Welcome To Alvin Hosting.</h3>
+        <p>Made with love ♡.</p>
+      </div>
+    </header>
+
+    <div class="row">
+      {% for server in servers %}
+        <div class="col-lg-6 col-md-12 mb-4">
+          <div class="card server-card" data-owner="{{ server.owner }}" data-name="{{ server.name }}" onclick="window.location.href='/console/{{ server.owner }}/{{ server.name }}'">
+            <div class="card-header">
+              <h5>{{ server.name }}</h5>
+              <div class="status-indicator {% if server.status == 'Offline' %}offline{% endif %}">
+                  {{ server.status }}
+              </div>
+            </div>
+            <div class="server-specs">
+              <div class="spec-item"><i class="bi bi-memory"></i> <span class="spec-ram">RAM: ... / {{ (server.ram|int / 1024)|round(2) if server.ram|int >= 1024 else server.ram|int ~ ' MB' }}</span></div>
+              <div class="spec-item"><i class="bi bi-cpu-fill"></i> <span class="spec-cpu">CPU: ... / {{ server.cpu }}%</span></div>
+              <div class="spec-item"><i class="bi bi-device-hdd-fill"></i> <span class="spec-disk">Disk: ... / {{ (server.disk|int / 1024)|round(2) if server.disk|int >= 1024 else server.disk|int ~ ' MB' }}</span></div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      
+      {% if servers|length == 0 %}
+        <div class="col-12">
+            <p>No servers found.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const updateAllServerStats = () => {
+            const serverCards = document.querySelectorAll('.server-card');
+
+            serverCards.forEach(card => {
+                const owner = card.dataset.owner;
+                const name = card.dataset.name;
+                const url = `/server_stats/${owner}/${name}`;
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error(`Error fetching stats for ${name}:`, data.error);
+                            return;
+                        }
+
+                        const ramSpan = card.querySelector('.spec-ram');
+                        const cpuSpan = card.querySelector('.spec-cpu');
+                        const diskSpan = card.querySelector('.spec-disk');
+
+                        ramSpan.textContent = `RAM: ${data.ram_used} / ${data.ram_limit}`;
+                        cpuSpan.textContent = `CPU: ${data.cpu.toFixed(1)}% / ${data.cpu_limit}%`;
+                        diskSpan.textContent = `Disk: ${data.disk_used} / ${data.disk_limit}`;
+                    })
+                    .catch(error => {
+                        console.error(`Failed to fetch stats for server ${name}:`, error);
+                    });
+            });
+        };
+
+        updateAllServerStats();
+        setInterval(updateAllServerStats, 5000);
+    });
+</script>
+
+</body>
+</html>
+

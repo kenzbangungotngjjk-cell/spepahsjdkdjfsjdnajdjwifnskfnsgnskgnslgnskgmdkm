@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --background: #121212;
+      --sidebar-bg: #1A1A1A;
+      --card-bg: #1E1E1E;
+      --card-hover-bg: #252525;
+      --text-primary: #EAEAEA;
+      --text-secondary: #A0A0A0;
+      --accent: #3A86FF;
+      --border-color: #333333;
+    }
+
+    body {
+      background-color: var(--background);
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      width: 240px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      height: 100%;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      transition: width 0.3s ease;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 20px 20px 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-brand i {
+      font-size: 24px;
+      color: var(--accent);
+    }
+    .sidebar-brand h4 {
+      margin: 0;
+      font-weight: 600;
+    }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: var(--text-secondary);
+      padding: 15px 25px;
+      font-size: 16px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+    }
+    .sidebar a:hover {
+      background: linear-gradient(90deg, rgba(58, 134, 255, 0.1), transparent);
+      color: var(--text-primary);
+      border-left: 3px solid var(--accent);
+    }
+    .sidebar a.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      border-left: 3px solid var(--accent);
+      background: linear-gradient(90deg, rgba(58, 134, 255, 0.1), transparent);
+    }
+    .sidebar-footer {
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 1px solid var(--border-color);
+    }
+    .sidebar-footer .powered-by-text {
+        font-size: 12px;
+        text-align: center;
+        color: var(--text-secondary);
+        margin-bottom: 10px;
+    }
+    .sidebar-footer a {
+        padding: 10px 25px;
+    }
+
+    /* --- Main Content --- */
+    .main {
+      margin-left: 240px;
+      padding: 30px;
+      transition: margin-left 0.3s ease;
+    }
+    .tab-content h3 {
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-primary);
+    }
+    .card h5 {
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    /* --- Forms & Tables --- */
+    .form-control {
+      background-color: #2f3235;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+    .form-control:focus {
+      background-color: #3a3d40;
+      box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+    .form-control::placeholder {
+      color: #888;
+    }
+    .table {
+      --bs-table-bg: transparent;
+      --bs-table-border-color: var(--border-color);
+      --bs-table-color: var(--text-primary);
+      --bs-table-striped-bg: #252525;
+      --bs-table-hover-bg: #2a2a2a;
+    }
+    .table thead th {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .form-check-input:checked {
+        background-color: var(--accent);
+        border-color: var(--accent);
+    }
+    
+    /* --- Mobile Navigation --- */
+    .mobile-nav {
+      display: none; /* Hidden by default */
+    }
+
+    /* --- Responsive Design --- */
+    @media (max-width: 992px) { /* Tablet view */
+      .sidebar {
+        width: 80px;
+      }
+      .sidebar-brand h4, .sidebar a span, .sidebar-footer .powered-by-text {
+        display: none;
+      }
+      .sidebar a, .sidebar-footer a {
+        justify-content: center;
+      }
+      .main {
+        margin-left: 80px;
+      }
+    }
+
+    @media (max-width: 768px) { /* Mobile view */
+      .sidebar {
+        display: none; /* Hide sidebar completely */
+      }
+      .main {
+        margin-left: 0;
+        padding: 20px;
+        padding-bottom: 100px; /* Space for mobile nav */
+      }
+      .mobile-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: var(--sidebar-bg);
+        border-top: 1px solid var(--border-color);
+        z-index: 1001;
+      }
+      .mobile-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: var(--text-secondary);
+        font-size: 12px;
+        gap: 4px;
+        flex-grow: 1; 
+        padding: 5px 0;
+      }
+      .mobile-nav a i {
+        font-size: 20px;
+      }
+      .mobile-nav a.active {
+        color: var(--accent);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <i class="bi bi-shield-lock-fill"></i>
+      <h4>Admin Panel</h4>
+    </div>
+    <a href="#" id="home-tab"><i class="bi bi-house-door-fill"></i> <span>Home</span></a>
+    <a href="#" id="users-tab"><i class="bi bi-people-fill"></i> <span>Users</span></a>
+    <a href="#" id="servers-tab"><i class="bi bi-hdd-stack-fill"></i> <span>Servers</span></a>
+    <a href="#" id="settings-tab"><i class="bi bi-gear-fill"></i> <span>Settings</span></a>
+    
+    <div class="sidebar-footer">
+        <p class="powered-by-text"><small>Powered By Alvin Hosting</small></p>
+        <a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a>
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    <a href="#" id="home-tab-mobile"><i class="bi bi-house-door-fill"></i> Home</a>
+    <a href="#" id="users-tab-mobile"><i class="bi bi-people-fill"></i> Users</a>
+    <a href="#" id="servers-tab-mobile"><i class="bi bi-hdd-stack-fill"></i> Servers</a>
+    <a href="#" id="settings-tab-mobile"><i class="bi bi-gear-fill"></i> Settings</a>
+    <a href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+  </nav>
+
+  <div class="main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div id="home" class="tab-content">
+      <h3>Powered By Alvin HOSTING</h3>
+      <p class="text-secondary">Here is an overview of your total resource allocation.</p>
+      
+      <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card p-3">
+                <h5><i class="bi bi-memory text-primary"></i> Total RAM Usage</h5>
+                <h4 class="mb-2">{{ stats.total_ram }} / {{ stats.max_ram }}</h4>
+                <div class="progress" style="height: 10px; background-color: var(--border-color);">
+                    <div class="progress-bar" role="progressbar" style="width: {{ stats.ram_percent }}%;" aria-valuenow="{{ stats.ram_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card p-3">
+                <h5><i class="bi bi-cpu-fill text-primary"></i> Total CPU Usage</h5>
+                <h4 class="mb-2">{{ stats.total_cpu }}% / {{ stats.max_cpu }}%</h4>
+                <div class="progress" style="height: 10px; background-color: var(--border-color);">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ stats.cpu_percent }}%;" aria-valuenow="{{ stats.cpu_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card p-3">
+                <h5><i class="bi bi-device-hdd-fill text-primary"></i> Total Disk Usage</h5>
+                <h4 class="mb-2">{{ stats.total_disk }} / {{ stats.max_disk }}</h4>
+                <div class="progress" style="height: 10px; background-color: var(--border-color);">
+                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ stats.disk_percent }}%;" aria-valuenow="{{ stats.disk_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="users" class="tab-content" style="display:none;">
+      <h3>Manage Users</h3>
+      <div class="card p-3 mb-4">
+        <h5>Create New User</h5>
+        <form method="POST">
+          <div class="row g-3">
+            <div class="col-md-5"><input type="text" name="new_username" class="form-control" placeholder="Username" required></div>
+            <div class="col-md-5"><input type="password" name="new_password" class="form-control" placeholder="Password" required></div>
+            <div class="col-md-2"><button name="create_user" class="btn btn-primary w-100">Create</button></div>
+          </div>
+        </form>
+      </div>
+
+      <div class="card p-3 table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Servers Owned</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>
+                {{ user.username }}
+                {% if user.username == 'Alvin' %}
+                  <span class="badge bg-primary ms-1">Admin</span>
+                {% endif %}
+              </td>
+              <td><span class="badge bg-secondary">{{ user.servers }}</span></td>
+              <td class="text-end">
+                {% if user.username != 'Alvin' %}
+                  <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal" data-username="{{ user.username }}">
+                    <i class="bi bi-pencil-fill"></i> Manage
+                  </button>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="servers" class="tab-content" style="display:none;">
+      <h3>Manage Servers</h3>
+      <div class="card p-3 mb-4">
+        <h5>Create New Server</h5>
+        <form method="POST" class="row g-3">
+          <div class="col-md-3"><input type="text" name="server_owner" class="form-control" placeholder="Owner Username" required></div>
+          <div class="col-md-3"><input type="text" name="server_name" class="form-control" placeholder="Server Name" required></div>
+          <div class="col-md-2"><input type="number" name="server_ram" class="form-control" placeholder="RAM (MB)" min="1" required></div>
+          <div class="col-md-2"><input type="number" name="server_cpu" class="form-control" placeholder="CPU (%)" min="1" required></div>
+          <div class="col-md-2"><input type="number" name="server_disk" class="form-control" placeholder="Disk (MB)" min="1" required></div>
+          <div class="col-12"><button name="create_server" class="btn btn-primary">Create Server</button></div>
+        </form>
+      </div>
+
+      <div class="card p-3 table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Server Name</th>
+              <th>Owner</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for server in servers %}
+            <tr>
+              <td>{{ server.name }}</td>
+              <td>{{ server.owner }}</td>
+              <td class="text-end">
+                <button type="button" class="btn btn-primary btn-sm" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#editServerModal"
+                        data-name="{{ server.name }}"
+                        data-owner="{{ server.owner }}"
+                        data-ram="{{ server.ram }}"
+                        data-cpu="{{ server.cpu }}"
+                        data-disk="{{ server.disk }}">
+                  <i class="bi bi-pencil-fill"></i> Manage
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="settings" class="tab-content" style="display:none;">
+    <h3>Settings</h3>
+    <form method="POST">
+        <div class="card p-3 mb-4">
+            <h5>Registration System</h5>
+            <p class="text-secondary">Control whether new users can create an account on the login page.</p>
+            <div class="form-check form-switch fs-5">
+                <input class="form-check-input" type="checkbox" role="switch" id="registrationSwitch" name="registration_enabled" {% if registration_enabled %}checked{% endif %}>
+                <label class="form-check-label" for="registrationSwitch">Registration Enabled</label>
+            </div>
+        </div>
+
+        <div class="card p-3 mb-4">
+            <h5>Server Splitter System</h5>
+            <p class="text-secondary">Control whether users can split their server resources into a new server.</p>
+            <div class="form-check form-switch fs-5">
+                <input class="form-check-input" type="checkbox" role="switch" id="splitterSwitch" name="splitter_enabled" {% if splitter_enabled %}checked{% endif %}>
+                <label class="form-check-label" for="splitterSwitch">Server Splitting Enabled</label>
+            </div>
+        </div>
+        
+        <button type="submit" name="update_settings" class="btn btn-primary">Save Settings</button>
+    </form>
+</div>
+
+  <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: var(--card-bg); border-color: var(--border-color);">
+        <div class="modal-header" style="border-bottom-color: var(--border-color);">
+          <h5 class="modal-title" id="editUserModalLabel">Manage User</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST">
+          <div class="modal-body">
+            <input type="hidden" name="old_username" id="edit-old-username">
+            <div class="mb-3">
+              <label for="edit-new-username" class="form-label">Username</label>
+              <input type="text" name="new_username" id="edit-new-username" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label for="edit-new-password" class="form-label">New Password (optional)</label>
+              <input type="password" name="new_password" id="edit-new-password" class="form-control" placeholder="Leave blank to keep current password">
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between" style="border-top-color: var(--border-color);">
+            <button type="submit" name="delete_user_from_modal" class="btn btn-danger">Delete User</button>
+            <div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" name="edit_user" class="btn btn-primary">Save Changes</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="editServerModal" tabindex="-1" aria-labelledby="editServerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: var(--card-bg); border-color: var(--border-color);">
+        <div class="modal-header" style="border-bottom-color: var(--border-color);">
+          <h5 class="modal-title" id="editServerModalLabel">Manage Server</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST">
+          <div class="modal-body">
+            <input type="hidden" name="old_server_name" id="edit-old-server-name">
+            <input type="hidden" name="old_owner" id="edit-old-owner">
+            <div class="mb-3">
+              <label for="edit-server-name" class="form-label">Server Name</label>
+              <input type="text" name="server_name" id="edit-server-name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label for="edit-server-owner" class="form-label">Owner</label>
+              <input type="text" name="server_owner" id="edit-server-owner" class="form-control" required>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="edit-server-ram" class="form-label">RAM (MB)</label>
+                <input type="number" name="server_ram" id="edit-server-ram" class="form-control" min="1" required>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="edit-server-cpu" class="form-label">CPU (%)</label>
+                <input type="number" name="server_cpu" id="edit-server-cpu" class="form-control" min="1" required>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="edit-server-disk" class="form-label">Disk (MB)</label>
+                <input type="number" name="server_disk" id="edit-server-disk" class="form-control" min="1" required>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between" style="border-top-color: var(--border-color);">
+            <button type="submit" name="delete_server_from_modal" class="btn btn-danger">Delete Server</button>
+            <div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" name="edit_server" class="btn btn-primary">Save Changes</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+      document.getElementById(tabId).style.display = 'block';
+      document.querySelectorAll('.sidebar a, .mobile-nav a').forEach(link => link.classList.remove('active'));
+      
+      const desktopTab = document.getElementById(tabId + '-tab');
+      const mobileTab = document.getElementById(tabId + '-tab-mobile');
+      if (desktopTab) desktopTab.classList.add('active');
+      if (mobileTab) mobileTab.classList.add('active');
+    }
+
+    document.getElementById('home-tab').addEventListener('click', (e) => { e.preventDefault(); showTab('home'); });
+    document.getElementById('users-tab').addEventListener('click', (e) => { e.preventDefault(); showTab('users'); });
+    document.getElementById('servers-tab').addEventListener('click', (e) => { e.preventDefault(); showTab('servers'); });
+    document.getElementById('settings-tab').addEventListener('click', (e) => { e.preventDefault(); showTab('settings'); });
+
+    document.getElementById('home-tab-mobile').addEventListener('click', (e) => { e.preventDefault(); showTab('home'); });
+    document.getElementById('users-tab-mobile').addEventListener('click', (e) => { e.preventDefault(); showTab('users'); });
+    document.getElementById('servers-tab-mobile').addEventListener('click', (e) => { e.preventDefault(); showTab('servers'); });
+    document.getElementById('settings-tab-mobile').addEventListener('click', (e) => { e.preventDefault(); showTab('settings'); });
+
+    // Handle Edit User Modal
+    const editUserModal = document.getElementById('editUserModal');
+    if (editUserModal) {
+      editUserModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const username = button.getAttribute('data-username');
+        editUserModal.querySelector('#edit-old-username').value = username;
+        editUserModal.querySelector('#edit-new-username').value = username;
+      });
+    }
+    
+    // Handle Edit Server Modal
+    const editServerModal = document.getElementById('editServerModal');
+    if (editServerModal) {
+        editServerModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const name = button.getAttribute('data-name');
+            const owner = button.getAttribute('data-owner');
+            const ram = button.getAttribute('data-ram');
+            const cpu = button.getAttribute('data-cpu');
+            const disk = button.getAttribute('data-disk');
+
+            editServerModal.querySelector('#edit-old-server-name').value = name;
+            editServerModal.querySelector('#edit-old-owner').value = owner;
+            editServerModal.querySelector('#edit-server-name').value = name;
+            editServerModal.querySelector('#edit-server-owner').value = owner;
+            editServerModal.querySelector('#edit-server-ram').value = ram;
+            editServerModal.querySelector('#edit-server-cpu').value = cpu;
+            editServerModal.querySelector('#edit-server-disk').value = disk;
+        });
+    }
+
+    showTab('home');
+  </script>
+
+</body>
+</html>
